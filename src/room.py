@@ -18,7 +18,10 @@ class Room:
         """
         uses the static list possible moves to generate a list of commands available to a room
         """
-        return [mov[:1] for mov in Room.possible_moves if getattr(self, mov) != None]
+        return [mov[:1] for mov in Room.possible_moves if getattr(self, mov) is not None]
+
+    def get_actions(self):
+        return []
 
     def display(self):
         print(self.name)

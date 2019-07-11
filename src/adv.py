@@ -1,3 +1,4 @@
+import os
 from room import Room
 from player import Player
 # Declare all the rooms
@@ -49,13 +50,21 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
-isPlaying = True
 player = Player(room["outside"])
-while isPlaying:
+while True:
+    # print the room description
     player.describe_room()
-    do_next = input("What will you do?")
 
+    # get user input
+    do_next = input("\nWhat will you do? ")
+
+    # interpret user input
     if do_next == "q":
-        isPlaying = False
+        break
     elif do_next in player.room.get_moves():
         player.move(do_next)
+    elif do_next in player.room.get_actions():
+        player.action(do_next)
+
+    # clear the console
+    os.system('cls' if os.name == 'nt' else 'clear')

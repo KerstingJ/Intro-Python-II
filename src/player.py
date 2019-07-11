@@ -9,16 +9,24 @@ class Player:
         self.room = room
 
     def describe_room(self):
+        """
+        Player logs a description of the current room they are in
+        includes room description with name and description
+        possible movements, and possible actions
+        """
         print("\n")
         self.room.display()
-        print("What do you want to do?")
+        print("\nWhat do you want to do?")
         print("Possible Moves: ", self.room.get_moves())
-        print("Possible Actions: ", "[None]")
+        print("Possible Actions: ", "['q': quit]")
 
-    def move(self, dir):
+    def move(self, move):
         """
-        if dir is a move available for the players current room
+        if move is a move available for the players current room
         move player to the room in that direction
         """
-        if dir in self.room.get_moves():
-            self.room = getattr(self.room, f"{dir}_to")
+        if move in self.room.get_moves():
+            self.room = getattr(self.room, f"{move}_to")
+
+    def action(self, action):
+        pass
