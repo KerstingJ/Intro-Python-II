@@ -1,17 +1,29 @@
 
 class Item:
-    def __init__(self, name, description, type="normal"):
-        self.name = name
-        self.description = description
-        self.consumable = False
-        self.type = type
-
-    @classmethod
-    def createConsumable(self, name, description, affects):
+    def __init__(self, name, description, item_type="normal"):
         """
         creates a consumable item
+        takes in a name, description, and option item_type
         """
-        pass
+        self.name = name
+        self.description = description
+        self.item_type = item_type
+        self.consumable = False
+        self.effects = None
+
+    @classmethod
+    def createConsumable(self, name, description, item_type, effects):
+        """
+        creates a consumable item
+        takes in a name, description, item_type, and effects
+        effects expects a dictionary
+            key being the name of the player stat it affects
+            value being an integer value to be applied to that stat
+        """
+        item = Item(name, description, item_type)
+        item.consumable = True
+        item.effects = effects
+        return item
 
     def __str__(self):
         return f"{self.name}: {self.description}"
