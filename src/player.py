@@ -14,18 +14,14 @@ class Player:
         includes room description with name and description
         possible movements, and possible actions
         """
-        print("\n")
         self.room.display()
-        print("\nWhat do you want to do?")
-        print("Possible Moves: ", self.room.get_moves())
-        print("Possible Actions: ", "['q': quit]")
 
     def move(self, move):
         """
         if move is a move available for the players current room
         move player to the room in that direction
         """
-        if move in self.room.get_moves():
+        if move in self.room.get_possible_moves():
             self.room = getattr(self.room, f"{move}_to")
 
     def action(self, action):

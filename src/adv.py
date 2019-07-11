@@ -34,6 +34,14 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+
+# Visual Map
+"""  ___
+    | | |
+    |  _|
+    |_|
+"""
+
 #
 # Main
 #
@@ -61,9 +69,9 @@ while True:
     # interpret user input
     if do_next == "q":
         break
-    elif do_next in player.room.get_moves():
+    elif do_next in player.room.get_possible_moves():
         player.move(do_next)
-    elif do_next in player.room.get_actions():
+    elif do_next in player.room.get_possible_actions():
         player.action(do_next)
 
     # clear the console

@@ -14,15 +14,19 @@ class Room:
         self.e_to = None
         self.w_to = None
 
-    def get_moves(self):
+    def get_possible_moves(self):
         """
-        uses the static list possible moves to generate a list of commands available to a room
+        uses the static list possible moves to generate a list of directions available from a room
         """
         return [mov[:1] for mov in Room.possible_moves if getattr(self, mov) is not None]
 
-    def get_actions(self):
+    def get__possible_actions(self):
         return []
 
     def display(self):
-        print(self.name)
-        print(self.text)
+        print(
+            f"""{self.name}
+            \n   {self.text}""")
+        print("\nPossible Moves: ")
+        print(*self.get_possible_moves(), sep=", ")
+        print("Possible Actions: ", "['q': quit]")
