@@ -12,7 +12,7 @@ class Item:
         self.effects = None
 
     @classmethod
-    def createConsumable(self, name, description, item_type, effects):
+    def createConsumable(cls, name, description, item_type, effects):
         """
         creates a consumable item
         takes in a name, description, item_type, and effects
@@ -20,7 +20,7 @@ class Item:
             key being the name of the player stat it affects
             value being an integer value to be applied to that stat
         """
-        item = Item(name, description, item_type)
+        item = cls(name, description, item_type)
         item.consumable = True
         item.effects = effects
         return item
