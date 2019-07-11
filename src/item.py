@@ -12,7 +12,7 @@ class Item:
         self.effects = None
 
     @classmethod
-    def createConsumable(cls, name, description, item_type, effects):
+    def create_consumable(cls, name, description, item_type, effects):
         """
         creates a consumable item
         takes in a name, description, item_type, and effects

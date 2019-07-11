@@ -6,9 +6,14 @@ class Room:
     """Room object has a name and text"""
     possible_moves = ["n_to", "s_to", "e_to", "w_to"]
 
-    def __init__(self, name, text):
+    def __init__(self, name, text, items=None):
         self.name = name
         self.text = text
+        if items is None:
+            self.items = []
+        else:
+            self.items = items[:]
+
         self.n_to = None
         self.s_to = None
         self.e_to = None
@@ -20,13 +25,12 @@ class Room:
         """
         return [mov[:1] for mov in Room.possible_moves if getattr(self, mov) is not None]
 
-    def get__possible_actions(self):
-        return []
-
     def display(self):
         print(
             f"""{self.name}
             \n   {self.text}""")
+        if len(self.items) > 0:
+            print("\nYou see some items nearby: ")
+            print(*[item.name for item in self.items], sep=", ")
         print("\nPossible Moves: ")
         print(*self.get_possible_moves(), sep=", ")
-        print("Possible Actions: ", "['q': quit]")
