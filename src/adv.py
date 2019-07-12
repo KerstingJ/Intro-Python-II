@@ -5,16 +5,14 @@ from item import Item
 # Declare all the rooms
 
 items = {
-    "sandwhich": Item.create_consumable(
-        "sandwhich",
-        "a suspiciously fresh sandwhich",
-        "food",
+    "sandwich": Item.create_consumable(
+        "sandwich",
+        "a suspiciously fresh sandwich",
         {"health": 50}
     ),
     "old fish": Item.create_consumable(
         "bad fish",
         "yuck, that stinks",
-        "food",
         {"health": -50}
     ),
     "small rock": Item(
@@ -44,7 +42,7 @@ the distance, but there is no way across the chasm.""",
 
     'narrow':   Room("Narrow Passage", """The narrow passage bends here from west
 to north. The smell of gold permeates the air.""",
-                     [items["small rock"], items["sandwhich"]]),
+                     [items["small rock"], items["sandwich"]]),
 
     'treasure': Room("Treasure Chamber", """You've found the long-lost treasure
 chamber! Sadly, it has already been completely emptied by
@@ -87,26 +85,18 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
-test = ""
-player = Player(room["outside"])
+player = Player(room["outside"], [items["sandwich"], items["sandwich"]])
 while True:
     # clear the console
     os.system('cls' if os.name == 'nt' else 'clear')
 
     # print the room description
-    print(test)
     player.describe_room()
 
     # get user input
-    do_next = input("\nWhat will you do? ").strip()
+    next_action = input("\nWhat will you do? ").strip()
 
-    # interpret user input
-    if do_next == "quit":
+    if next_action == "quit":
         break
-    elif do_next in player.room.get_possible_moves():
-        player.move(do_next)
-    elif do_next.split(" ")[0] in player.possible_actions():
-        # actions are input as a string "action item"
-        do_this = do_next.split(" ")[0]
-        with_this = do_next[len(do_this)+1:]
-        player.reducer(do_this, with_this)
+
+    player.do(next_action)
