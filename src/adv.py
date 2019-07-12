@@ -2,6 +2,7 @@ import os
 from room import Room
 from player import Player
 from item import Item
+from art import game_over
 # Declare all the rooms
 
 items = {
@@ -11,14 +12,34 @@ items = {
         {"health": 50}
     ),
     "old fish": Item.create_consumable(
-        "bad fish",
+        "old fish",
         "yuck, that stinks",
         {"health": -50}
     ),
+
+    "axe": Item.create_equipable(
+        "axe",
+        "a bit rusty but it will chop a tree",
+        {"strength": 0.15}
+    ),
+    "great axe": Item.create_equipable(
+        "great axe",
+        "that looks dangerous",
+        {
+            "strength": 0.35,
+            "defense": 0.15
+        }
+    ),
+
+    "armour": Item.create_equipable(
+        "armour",
+        "some basic armour",
+        {"defense": 0.15}
+    ),
+
     "small rock": Item(
         "small rock",
-        "a small rock, looks like it would be good to skip across a lake"
-
+        "looks like it would be good to skip across a lake"
     ),
     "garbage": Item(
         "garbage",
@@ -29,16 +50,16 @@ items = {
 room = {
     'outside':  Room("Outside Cave Entrance",
                      "North of you, the cave mount beckons",
-                     [items["garbage"]]),
+                     [items["garbage"], items["armour"]]),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east.""",
-                     [items["small rock"], items["old fish"]]),
+                     [items["small rock"], items["old fish"], items["axe"]]),
 
     'overlook': Room("Grand Overlook", """A steep cliff appears before you, falling
 into the darkness. Ahead to the north, a light flickers in
 the distance, but there is no way across the chasm.""",
-                     [items["old fish"]]),
+                     [items["old fish"], items["great axe"]]),
 
     'narrow':   Room("Narrow Passage", """The narrow passage bends here from west
 to north. The smell of gold permeates the air.""",
@@ -85,18 +106,22 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
-player = Player(room["outside"], [items["sandwich"], items["sandwich"]])
+player = Player(room["outside"], [items["sandwich"]])
 while True:
+
     # clear the console
     os.system('cls' if os.name == 'nt' else 'clear')
-
     # print the room description
     player.describe_room()
-
     # get user input
     next_action = input("\nWhat will you do? ").strip()
-
     if next_action == "quit":
         break
+    else:
+        player.do(next_action)
 
-    player.do(next_action)
+    # TODO: move this to another class
+    if player.health <= 0:
+        print(player.message)
+        print(game_over)
+        break

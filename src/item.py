@@ -9,7 +9,6 @@ class Item:
         self.description = description
         # TODO: refactor to use item_type insted of boolean consumable
         self.item_type = item_type
-        self.consumable = False
         self.effects = None
 
     @classmethod
@@ -22,7 +21,6 @@ class Item:
             value being an integer value to be applied to that stat
         """
         item = cls(name, description, "consumable")
-        item.consumable = True
         item.effects = effects
         return item
 
@@ -37,7 +35,6 @@ class Item:
             value being an integer value to be applied to that stat
         """
         item = cls(name, description, "equipable")
-        item.consumable = false
         item.effects = effects
         return item
 

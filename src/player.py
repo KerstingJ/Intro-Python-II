@@ -7,17 +7,39 @@ class Player:
     """Player Object for Adventure Game"""
 
     # TODO: make a help action that looks up action in dictionary and prints details
-    actions = ["inspect", "grab", "inventory", "eat", "drop", "destroy"]
 
-    def __init__(self, room, items=None):
+    def __init__(self, room, items=None, equipment=None):
         self.room = room
         self.health = 100
+        self.base_strength = 10
+        self.base_defense = 10
         self.strength = 10
+        self.defense = 10
         self.items = items or []
+        self.equipment = equipment or []
         self.message = ""
 
     def possible_actions(self):
-        return ["quit", *Player.actions]
+        # TODO: make this dynamic, possible actions depend on state
+        if len(self.items) > 0:
+            i_actions = ["eat", "drop", "destroy"]
+        else:
+            i_actions = []
+
+        # chose this style because it fits nicely on one line
+        # while still being readable
+        r_actions = [] if len(self.room.items) <= 0 else ["grab"]
+
+        inspect = ["inspect"] if len(
+            i_actions) > 0 or len(r_actions) > 0 else []
+
+        equip = []
+        for item in self.items:
+            if item.item_type == "equipable":
+                equip.append("equip")
+                break
+
+        return ["quit", "status", "inventory", *inspect, *r_actions, *i_actions, *equip]
 
     def describe_room(self):
         """
@@ -43,21 +65,50 @@ class Player:
         else:
             self.message = f"You can not move that way"
 
-    def inspect(self, item_name):
+    def inspect(self, item_name, location="room"):
         """ 
         Inspects the item with item_name if it exists in the players
         current room
         """
-        item = Item.findByName(item_name, self.room.items)
-        if item is not None:
-            self.message = item.__str__()
+
+        # if user specified location part item_name for location
+        # we assume that input will have format
+        # "item in location"
+        # TODO: this may be able to get pulled out to be used with other commands
+        # ex. eat, destroy
+        if " in " in item_name:
+            # if the item_name contains ` in ` we expect the second half to be a location
+            # players can serch `in room` or `in inventory`
+            item_name, location = item_name.split(" in ")
         else:
-            self.message = f"could not see item: {item_name}\n found"
+            # if no location specified lets assume they are looking
+            # around the room
+            item_name = item_name
+            location = "room"
+
+        # get item from location
+        if location == "room":
+            item = Item.findByName(item_name, self.room.items)
+        elif location == "inventory":
+            item = Item.findByName(item_name, self.items)
+
+        if item is not None:
+            self.message = f"{item.__str__()}, {item.item_type}"
+        else:
+            self.message = f"could not see {item_name} in {location}"
 
     def inventory(self):
         inventory = [item.name for item in self.items]
         items = ", a ".join(inventory)
         self.message = f"in your bag you find:\na {items}"
+
+    def status(self):
+        self.message = f"""
+        Player Status:
+        health: {self.health}
+        strength: {self.strength}
+        defense: {self.defense}
+        """
 
     def grab(self, item_name):
         """
@@ -73,16 +124,46 @@ class Player:
 
     def eat(self, item_name):
         item = Item.getByName(item_name, self.items)
-        if item is not None and item.consumable == True:
+
+        if item is not None and item.item_type == "consumable":
             message = f"\n you ate the {item.name}"
             for key in item.effects:
+                # get current attributes value
                 attr = getattr(self, key)
-                attr += item.effects[key]
+                # update attribute
+                setattr(self, key, attr + item.effects[key])
+
+                # build result message
                 effect = "gained" if item.effects[key] > 0 else "lost"
-                message += f"\nyour {key} {effect} {item.effects[key]} points"
+                message += f"\nyou {effect} {abs(item.effects[key])} points of {key}"
+
             self.message = message
         else:
-            self.message = f"could not eat item: {item_name}"
+            if item is not None:
+                self.items.append(item)
+
+            self.message = f"could not eat {item_name}"
+
+    def equip(self, item_name):
+        item = Item.getByName(item_name, self.items)
+
+        if item is not None and item.item_type == "equipable":
+            message = f"\n you equip {item.name}"
+            for stat in item.effects:
+
+                base = getattr(self, f"base_{stat}")
+                current = getattr(self, stat)
+
+                # set stat to its current value plus the value of the multiplier
+                multiplier = (base * item.effects[stat])
+                setattr(self, stat, current + multiplier)
+            # TODO: make message more informative
+            self.message = message
+            self.equipment.append(item)
+        else:
+            if item is not None:
+                self.items.append(item)
+            self.message = f"could not equip {item.name}"
 
     def drop(self, item_name):
         item = Item.getByName(item_name, self.items)
@@ -95,7 +176,7 @@ class Player:
         if item is not None:
             self.message = f"you stomp the {item.name} into the floor until it cant be distinguished from dust"
 
-    def reducer(self, action, item):
+    def do_with(self, action, item):
         """
         calls a player objects methods based on the string passed in as action
         and passes that method the string value of item
@@ -112,10 +193,12 @@ class Player:
         # if input is
         elif next == "inventory":
             self.inventory()
+        elif next == "status":
+            self.status()
         elif next.split(" ")[0] in self.possible_actions():
             # actions are input as a string "action item"
             verb = next.split(" ")[0]
             noun = next[len(verb)+1:]
-            self.reducer(verb, noun)
+            self.do_with(verb, noun)
 
 #['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'name']
